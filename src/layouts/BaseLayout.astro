@@ -38,10 +38,15 @@ const {
   canonicalPath,
 } = Astro.props;
 
-// Astro.site comes from `site` in astro.config.mjs.
-const siteOrigin = Astro.site ?? new URL('https://heavenfurnituremart.com');
-const canonicalURL = new URL(canonicalPath ?? Astro.url.pathname, siteOrigin);
-const ogImageURL = new URL(image, siteOrigin);
+// Astro.site comes from `site` in astro.config.mjs; BASE_URL is the `base`
+// (e.g. "/RACDOX_Hackathon/") so every absolute path is deploy-correct.
+const siteOrigin = Astro.site ?? new URL('https://tahmid9510.github.io');
+const BASE = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const withBase = (p: string) => BASE + p.replace(/^\//, '');
+const canonicalURL = new URL(withBase(canonicalPath ?? ''), siteOrigin);
+const ogImageURL = new URL(withBase(image), siteOrigin);
+const faviconHref = withBase('/favicon.svg');
+const favicon512 = withBase('/fileslogio/favicon-512.png');
 
 // LocalBusiness / FurnitureStore structured data (§6).
 const jsonLd = {
@@ -51,9 +56,9 @@ const jsonLd = {
   name: BUSINESS.name,
   description: SEO.description,
   slogan: BUSINESS.tagline,
-  url: siteOrigin.origin,
+  url: canonicalURL.href,
   image: ogImageURL.href,
-  logo: new URL('/favicon.svg', siteOrigin).href,
+  logo: new URL(withBase('/favicon.svg'), siteOrigin).href,
   telephone: BUSINESS.phoneDisplay,
   email: BUSINESS.email,
   foundingDate: BUSINESS.foundingYear,
@@ -129,9 +134,9 @@ const jsonLd = {
     <meta name="generator" content={Astro.generator} />
 
     <!-- ===== Icons & theme colour ===== -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/fileslogio/favicon-512.png" />
-    <link rel="apple-touch-icon" href="/fileslogio/favicon-512.png" />
+    <link rel="icon" type="image/svg+xml" href={faviconHref} />
+    <link rel="icon" type="image/png" sizes="512x512" href={favicon512} />
+    <link rel="apple-touch-icon" href={favicon512} />
     <meta name="theme-color" content={SEO.themeColorLight} />
 
     <!-- ===== Open Graph (Facebook / WhatsApp link previews) ===== -->
@@ -160,8 +165,8 @@ const jsonLd = {
   <body>
     <div class="preloader" id="preloader" aria-hidden="true">
       <div class="preloader__box">
-        <img class="preloader__logo preloader__logo--light" src="/fileslogio/logo-mark-light.svg" alt="" width="120" height="144" />
-        <img class="preloader__logo preloader__logo--dark" src="/fileslogio/logo-mark-dark.svg" alt="" width="120" height="144" />
+        <img class="preloader__logo preloader__logo--light" src={withBase('/fileslogio/logo-mark-light.svg')} alt="" width="120" height="144" />
+        <img class="preloader__logo preloader__logo--dark" src={withBase('/fileslogio/logo-mark-dark.svg')} alt="" width="120" height="144" />
         <span class="preloader__bar"><span></span></span>
       </div>
     </div>

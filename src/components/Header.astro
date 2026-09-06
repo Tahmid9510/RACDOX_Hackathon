@@ -4,6 +4,8 @@
 import { BUSINESS } from '../consts';
 import ThemeToggle from './ThemeToggle.astro';
 
+const BASE = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
 const navLinks = [
   { href: '#top', label: 'Home' },
   { href: '#collections', label: 'Collections' },
@@ -19,14 +21,14 @@ const navLinks = [
     <a class="brand" href="#top" aria-label="Heaven Furniture Mart, home">
       <img
         class="brand__logo brand__logo--light"
-        src="/fileslogio/logo-horizontal-light.svg"
+        src={`${BASE}fileslogio/logo-horizontal-light.svg`}
         alt=""
         width="427"
         height="161"
       />
       <img
         class="brand__logo brand__logo--dark"
-        src="/fileslogio/logo-horizontal-dark.svg"
+        src={`${BASE}fileslogio/logo-horizontal-dark.svg`}
         alt=""
         width="427"
         height="161"
