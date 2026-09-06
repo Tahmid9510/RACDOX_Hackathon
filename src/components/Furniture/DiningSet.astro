@@ -1,0 +1,37 @@
+---
+/* Brass line-drawing — Dining set (table flanked by two chairs, side elevation). */
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: className, title } = Astro.props;
+const labelled = Boolean(title);
+---
+<svg
+  class={className}
+  viewBox="0 0 256 148"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={labelled ? 'img' : undefined}
+  aria-label={title}
+  aria-hidden={labelled ? undefined : 'true'}
+  focusable="false"
+>
+  <!-- table top -->
+  <rect x="70" y="62" width="116" height="10" rx="5" />
+  <!-- table legs -->
+  <path d="M82 72v46M174 72v46" />
+  <!-- left chair -->
+  <path d="M40 50v68" />
+  <path d="M40 88h26" />
+  <path d="M40 88v-6" />
+  <path d="M66 88v30M44 118" />
+  <!-- right chair -->
+  <path d="M216 50v68" />
+  <path d="M190 88h26" />
+  <path d="M216 88v-6" />
+  <path d="M190 88v30" />
+</svg>

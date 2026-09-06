@@ -1,0 +1,355 @@
+---
+/* Bespoke (§4.7) — THE differentiator. Given weight: its own ground, a bold
+   three-step process (Consult → Design & choose → Craft & install) and a
+   single quiet nudge toward the primary WhatsApp action. */
+import { Picture } from 'astro:assets';
+import { BUSINESS } from '../consts';
+import workshopImg from '../assets/images/bespoke-workshop.jpg';
+
+const steps = [
+  {
+    n: '01',
+    title: 'Consult',
+    body: 'We visit your space or host you in the showroom, learn how you live, and advise on layout, materials and budget. Always free.',
+  },
+  {
+    n: '02',
+    title: 'Design & choose',
+    body: 'We design your piece to your measurements — then you choose the wood, fabric, finish and detailing until it is exactly right.',
+  },
+  {
+    n: '03',
+    title: 'Craft & install',
+    body: 'Our artisans build it by hand in our workshop. We deliver, install and place it in your home, measured and level.',
+  },
+];
+---
+<section class="bespoke section" id="bespoke" aria-labelledby="bespoke-title">
+  <canvas class="bespoke__motes" data-motes aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="bespoke__head" data-reveal>
+      <div class="section-head">
+        <span class="eyebrow">Bespoke, end to end</span>
+        <h2 id="bespoke-title" class="section-head__title">
+          Made for you, from first sketch to <em>final placement</em>.
+        </h2>
+      </div>
+      <p class="bespoke__lead">
+        Bespoke isn't an upgrade here — it's the whole idea. Three unhurried
+        steps take you from an empty corner to a piece that could only be yours.
+      </p>
+    </div>
+
+    <div class="bespoke__feature" data-reveal>
+      <Picture
+        src={workshopImg}
+        formats={['avif', 'webp']}
+        alt="A craftsman's hands marking a length of timber amid wood shavings in the workshop"
+        widths={[600, 900, 1300]}
+        sizes="(max-width: 820px) 92vw, 1140px"
+        loading="lazy"
+        class="bespoke__img"
+      />
+      <span class="bespoke__feature-cap">In our Chattogram workshop</span>
+    </div>
+
+    <ol class="bespoke__steps">
+      {steps.map((s, i) => (
+        <li class="bespoke__step" data-reveal style={`--reveal-delay:${i * 120}ms`}>
+          <span class="bespoke__num">{s.n}</span>
+          <span class="bespoke__node" aria-hidden="true"></span>
+          <h3 class="bespoke__step-title">{s.title}</h3>
+          <p class="bespoke__step-body">{s.body}</p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="bespoke__cta">
+      <a class="link-arrow" href={BUSINESS.whatsapp} target="_blank" rel="noopener">
+        Start your bespoke consultation
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ---- Three.js: "sunlight motes" backdrop for the Bespoke section ----
+  // Fully lazy: three.js is dynamically imported only when the section nears
+  // the viewport, and the render loop pauses whenever it scrolls out of view
+  // or the tab is hidden. Skipped for reduced motion / no WebGL.
+  const canvas = document.querySelector('.bespoke__motes');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (canvas instanceof HTMLCanvasElement && !reduce) {
+    const host = canvas.closest('.bespoke');
+    let started = false;
+
+    const boot = async () => {
+      if (started || !host) return;
+      started = true;
+      let THREE;
+      try {
+        THREE = await import('three');
+      } catch (_) {
+        return;
+      }
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(1);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+      camera.position.z = 22;
+
+      const COUNT = 120;
+      const positions = new Float32Array(COUNT * 3);
+      const speeds = new Float32Array(COUNT);
+      for (let i = 0; i < COUNT; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 46;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 24;
+        speeds[i] = 0.15 + Math.random() * 0.45;
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+      const brass = () =>
+        getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#b9925a';
+
+      const spr = document.createElement('canvas');
+      spr.width = spr.height = 64;
+      const g = spr.getContext('2d');
+      const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grd.addColorStop(0, 'rgba(255,255,255,1)');
+      grd.addColorStop(0.35, 'rgba(255,255,255,0.55)');
+      grd.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grd;
+      g.fillRect(0, 0, 64, 64);
+      const sprite = new THREE.CanvasTexture(spr);
+
+      const mat = new THREE.PointsMaterial({
+        color: new THREE.Color(brass()),
+        map: sprite,
+        size: 0.85,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true,
+      });
+      const points = new THREE.Points(geo, mat);
+      scene.add(points);
+
+      const resize = () => {
+        const r = host.getBoundingClientRect();
+        const w = host.clientWidth || Math.round(r.width) || window.innerWidth;
+        const h = host.clientHeight || Math.round(r.height) || window.innerHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      };
+      resize();
+      if ('ResizeObserver' in window) new ResizeObserver(resize).observe(host);
+      else window.addEventListener('resize', resize, { passive: true });
+
+      new MutationObserver(() => mat.color.set(brass())).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+      });
+
+      const pos = geo.attributes.position;
+      let raf = 0;
+      let running = false;
+      const tick = () => {
+        const arr = pos.array;
+        for (let i = 0; i < COUNT; i++) {
+          arr[i * 3 + 1] += speeds[i] * 0.02;
+          if (arr[i * 3 + 1] > 15) arr[i * 3 + 1] = -15;
+        }
+        pos.needsUpdate = true;
+        points.rotation.y += 0.0006;
+        renderer.render(scene, camera);
+        raf = requestAnimationFrame(tick);
+      };
+      const play = () => {
+        if (running || document.hidden) return;
+        running = true;
+        tick();
+      };
+      const pause = () => {
+        running = false;
+        cancelAnimationFrame(raf);
+      };
+
+      // run only while the section is on screen
+      new IntersectionObserver(
+        (entries) => (entries[0].isIntersecting ? play() : pause())
+      ).observe(host);
+      document.addEventListener('visibilitychange', () => (document.hidden ? pause() : play()));
+
+      canvas.classList.add('is-live');
+      play();
+    };
+
+    // Load Three.js only when the section is within ~500px of the viewport
+    const trigger = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trigger.disconnect();
+          if ('requestIdleCallback' in window) requestIdleCallback(() => boot(), { timeout: 1500 });
+          else boot();
+        }
+      },
+      { rootMargin: '500px' }
+    );
+    trigger.observe(host);
+  }
+</script>
+
+<style>
+  .bespoke {
+    position: relative;
+    background: var(--bg-alt);
+    transition: background-color 0.4s var(--ease);
+  }
+  .bespoke > .container { position: relative; z-index: 1; }
+  /* Three.js sunlight-motes canvas — behind the content, fades in once live */
+  .bespoke__motes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.4s var(--ease);
+  }
+  .bespoke__motes.is-live { opacity: 1; }
+
+  .bespoke__head {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: end;
+  }
+  .bespoke__lead {
+    font-size: var(--step-1);
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .bespoke__feature {
+    position: relative;
+    margin-top: clamp(2.2rem, 4vw, 3rem);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 16 / 7;
+    box-shadow: var(--shadow-md);
+  }
+  .bespoke__img { width: 100%; height: 100%; object-fit: cover; }
+  .bespoke__feature::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 14, 7, 0.05) 35%, rgba(20, 14, 7, 0.6));
+  }
+  .bespoke__feature-cap {
+    position: absolute;
+    left: clamp(1.1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 1.5rem);
+    z-index: 1;
+    color: #f4ecda;
+    font-size: var(--step--1);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .bespoke__steps {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 4vw, 3rem);
+    /* the connecting rail */
+    position: relative;
+  }
+  .bespoke__steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--line-strong) 12%,
+      var(--line-strong) 88%,
+      transparent
+    );
+  }
+
+  .bespoke__step {
+    position: relative;
+    padding-top: 3rem;
+  }
+  .bespoke__num {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: var(--step-3);
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .bespoke__node {
+    position: absolute;
+    top: 14px;
+    left: 2px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--bg-alt);
+    border: 2px solid var(--accent);
+  }
+  .bespoke__step-title {
+    margin-top: 0;
+    font-size: var(--step-2);
+    font-weight: 500;
+    color: var(--heading);
+  }
+  .bespoke__step-body {
+    margin-top: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .bespoke__cta { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+
+  @media (max-width: 820px) {
+    .bespoke__feature { aspect-ratio: 3 / 2; }
+    .bespoke__head { grid-template-columns: 1fr; align-items: start; }
+    .bespoke__lead { font-size: var(--step-0); }
+    .bespoke__steps { grid-template-columns: 1fr; gap: 0; }
+    /* vertical rail on mobile */
+    .bespoke__steps::before {
+      top: 8px;
+      bottom: 8px;
+      left: 6px;
+      right: auto;
+      width: 1px;
+      height: auto;
+      background: linear-gradient(180deg, transparent, var(--line-strong) 10%, var(--line-strong) 90%, transparent);
+    }
+    .bespoke__step {
+      padding-top: 0;
+      padding-left: 2.6rem;
+      padding-bottom: 2.4rem;
+    }
+    .bespoke__step:last-child { padding-bottom: 0; }
+    .bespoke__num { position: static; display: block; margin-bottom: 0.2rem; }
+    .bespoke__node { top: 6px; left: 0; }
+  }
+</style>

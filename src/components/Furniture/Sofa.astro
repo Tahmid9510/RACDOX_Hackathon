@@ -1,0 +1,37 @@
+---
+/* Brass line-drawing — Sofa (the signature/hero motif).
+   Decorative by default: inherits colour via `currentColor`, so parents set
+   `color`. Pass a title to expose it to assistive tech instead. */
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: className, title } = Astro.props;
+const labelled = Boolean(title);
+---
+<svg
+  class={className}
+  viewBox="0 0 256 148"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={labelled ? 'img' : undefined}
+  aria-label={title}
+  aria-hidden={labelled ? undefined : 'true'}
+  focusable="false"
+>
+  <!-- backrest -->
+  <rect x="46" y="34" width="164" height="52" rx="14" />
+  <!-- back cushion divide -->
+  <path d="M128 38v44" />
+  <!-- arms -->
+  <rect x="22" y="60" width="30" height="52" rx="14" />
+  <rect x="204" y="60" width="30" height="52" rx="14" />
+  <!-- seat -->
+  <rect x="46" y="74" width="164" height="34" rx="10" />
+  <path d="M128 76v30" />
+  <!-- legs -->
+  <path d="M32 112v14M60 106v14M196 106v14M224 112v14" />
+</svg>

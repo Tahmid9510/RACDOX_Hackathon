@@ -1,0 +1,110 @@
+---
+/* ThemeToggle — light/dark switch (§2a).
+   Understated icon button: a moon in light mode (tap → dark), a sun in dark
+   mode (tap → light). The pre-paint script in BaseLayout has already set the
+   correct theme before this renders; the small script below only handles the
+   click, persistence, aria-label and meta[theme-color] sync. */
+import { THEME_KEY, SEO } from '../consts';
+---
+<button
+  class="theme-toggle"
+  type="button"
+  data-theme-toggle
+  aria-label="Switch to dark theme"
+  title="Switch theme"
+>
+  <span class="theme-toggle__inner" aria-hidden="true">
+    <!-- moon (shown in light theme) -->
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.6 6.6 0 0 0 10.7 10.7Z" />
+    </svg>
+    <!-- sun (shown in dark theme) -->
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4.2" />
+      <path d="M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.9 1.9M17.5 17.5l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.9-1.9M17.5 6.5l1.9-1.9" />
+    </svg>
+  </span>
+</button>
+
+<script define:vars={{ THEME_KEY, LIGHT: SEO.themeColorLight, DARK: SEO.themeColorDark }}>
+  const root = document.documentElement;
+  const meta = document.querySelector('meta[name="theme-color"]');
+
+  function current() {
+    return root.dataset.theme === 'dark' ? 'dark' : 'light';
+  }
+
+  function sync(theme) {
+    const toDark = theme === 'light';
+    const label = toDark ? 'Switch to dark theme' : 'Switch to light theme';
+    document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('aria-pressed', String(theme === 'dark'));
+    });
+    if (meta) meta.setAttribute('content', theme === 'dark' ? DARK : LIGHT);
+  }
+
+  function apply(theme) {
+    if (theme === 'dark') root.dataset.theme = 'dark';
+    else root.dataset.theme = 'light';
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch (_) {}
+    sync(theme);
+  }
+
+  // Sync labels/theme-colour to whatever the pre-paint script settled on.
+  sync(current());
+
+  document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      apply(current() === 'dark' ? 'light' : 'dark');
+    });
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    inline-size: 42px;
+    block-size: 42px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--text);
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease),
+      background-color 0.3s var(--ease);
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .theme-toggle__inner {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+  }
+  .theme-toggle__inner svg {
+    grid-area: 1 / 1;
+    width: 20px;
+    height: 20px;
+    transition: opacity 0.3s var(--ease), transform 0.4s var(--ease);
+  }
+
+  /* Light theme → offer the moon; hide the sun */
+  .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+  .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+  /* Dark theme → offer the sun; hide the moon */
+  :global(:root[data-theme='dark']) .icon-sun {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+  :global(:root[data-theme='dark']) .icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+</style>

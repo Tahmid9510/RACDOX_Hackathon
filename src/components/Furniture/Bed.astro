@@ -1,0 +1,36 @@
+---
+/* Brass line-drawing — Bed (side elevation: headboard, pillow, mattress, frame). */
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: className, title } = Astro.props;
+const labelled = Boolean(title);
+---
+<svg
+  class={className}
+  viewBox="0 0 256 148"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={labelled ? 'img' : undefined}
+  aria-label={title}
+  aria-hidden={labelled ? undefined : 'true'}
+  focusable="false"
+>
+  <!-- headboard -->
+  <rect x="26" y="40" width="20" height="70" rx="7" />
+  <!-- footboard -->
+  <rect x="212" y="70" width="16" height="40" rx="6" />
+  <!-- mattress -->
+  <rect x="46" y="72" width="166" height="26" rx="12" />
+  <!-- pillow -->
+  <rect x="56" y="60" width="46" height="20" rx="10" />
+  <!-- frame / base -->
+  <path d="M46 98h166" />
+  <path d="M46 98v12M212 98v12" />
+  <!-- legs -->
+  <path d="M34 110v12M222 110v12" />
+</svg>

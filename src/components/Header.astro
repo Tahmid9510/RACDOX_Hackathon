@@ -1,0 +1,371 @@
+---
+/* Header — sticky, glassy. Brand lockup left; theme toggle, one primary
+   WhatsApp CTA, and a hamburger that opens a full-screen section menu right. */
+import { BUSINESS } from '../consts';
+import ThemeToggle from './ThemeToggle.astro';
+
+const navLinks = [
+  { href: '#top', label: 'Home' },
+  { href: '#collections', label: 'Collections' },
+  { href: '#why', label: 'Why Heaven' },
+  { href: '#bespoke', label: 'Bespoke' },
+  { href: '#story', label: 'Our Story' },
+  { href: '#visit', label: 'Visit' },
+  { href: '#contact', label: 'Contact' },
+];
+---
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="#top" aria-label="Heaven Furniture Mart, home">
+      <img
+        class="brand__logo brand__logo--light"
+        src="/fileslogio/logo-horizontal-light.svg"
+        alt=""
+        width="427"
+        height="161"
+      />
+      <img
+        class="brand__logo brand__logo--dark"
+        src="/fileslogio/logo-horizontal-dark.svg"
+        alt=""
+        width="427"
+        height="161"
+      />
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        {navLinks.filter((l) => l.href !== '#top').map((link) => (
+          <li><a class="site-nav__link" href={link.href}>{link.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <ThemeToggle />
+      <button
+        class="nav-toggle"
+        type="button"
+        data-menu-open
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="site-menu"
+      >
+        <span class="nav-toggle__bars" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Right-side glass drawer -->
+<div class="site-menu" id="site-menu" data-menu inert>
+  <div class="site-menu__panel">
+   <nav class="site-menu__nav" aria-label="Primary">
+    <ul class="site-menu__list">
+      {navLinks.map((link, i) => (
+        <li style={`--i:${i}`}>
+          <a class="site-menu__link" href={link.href} data-menu-link>
+            <span class="site-menu__num">{String(i + 1).padStart(2, '0')}</span>
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="site-menu__foot">
+      <a class="btn btn--primary" href={BUSINESS.whatsapp} target="_blank" rel="noopener" data-menu-link>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 0 0 4.73 1.2h.01c5.46 0 9.91-4.45 9.91-9.9 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.1.81.83-3.02-.2-.31a8.17 8.17 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.22 8.24c0 4.54-3.69 8.23-8.24 8.23Zm4.52-6.16c-.25-.13-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.76-1.85-.2-.48-.4-.42-.56-.43-.14-.01-.31-.01-.47-.01-.16 0-.43.06-.65.31-.23.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.12.16 1.73 2.64 4.19 3.7.58.25 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29Z" />
+        </svg>
+        Chat on WhatsApp
+      </a>
+      <address class="site-menu__meta">
+        <span>{BUSINESS.address.full}</span>
+        <a href={BUSINESS.phoneHref}>{BUSINESS.phoneDisplay}</a>
+      </address>
+    </div>
+   </nav>
+  </div>
+</div>
+
+<script>
+  const toggle = document.querySelector('[data-menu-open]');
+  const menu = document.querySelector('[data-menu]');
+  if (toggle && menu) {
+    const links = menu.querySelectorAll('[data-menu-link]');
+    let open = false;
+
+    const setOpen = (value) => {
+      open = value;
+      toggle.setAttribute('aria-expanded', String(value));
+      toggle.setAttribute('aria-label', value ? 'Close menu' : 'Open menu');
+      menu.classList.toggle('is-open', value);
+      document.body.style.overflow = value ? 'hidden' : '';
+      if (value) {
+        menu.removeAttribute('inert');
+      } else {
+        menu.setAttribute('inert', '');
+      }
+    };
+
+    toggle.addEventListener('click', () => setOpen(!open));
+
+    // Close the menu, then scroll to the section ourselves. Doing the scroll
+    // after unlocking body overflow avoids the lock swallowing the jump.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    links.forEach((l) => {
+      l.addEventListener('click', (e) => {
+        const href = l.getAttribute('href') || '';
+        setOpen(false);
+        if (href.length > 1 && href.startsWith('#')) {
+          const target = document.getElementById(href.slice(1));
+          if (target) {
+            e.preventDefault();
+            requestAnimationFrame(() => {
+              target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+              history.pushState(null, '', href);
+            });
+          }
+        }
+        // Non-hash links (e.g. WhatsApp) just navigate normally.
+      });
+    });
+    // Click the empty overlay to dismiss
+    menu.addEventListener('click', (e) => {
+      if (e.target === menu) setOpen(false);
+    });
+    // Escape closes and returns focus to the button
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && open) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--header-bg);
+    backdrop-filter: saturate(140%) blur(12px);
+    -webkit-backdrop-filter: saturate(140%) blur(12px);
+    border-bottom: 1px solid var(--line);
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-block-size: 76px;
+    padding-block: 0.6rem;
+  }
+
+  /* ---- Brand logo ---- */
+  .brand { display: inline-flex; align-items: center; min-width: 0; }
+  .brand__logo { height: 54px; width: auto; display: block; }
+  .brand__logo--dark { display: none; }
+  :global(:root[data-theme='dark']) .brand__logo--light { display: none; }
+  :global(:root[data-theme='dark']) .brand__logo--dark { display: block; }
+
+  /* ---- Inline nav (desktop) ---- */
+  .site-nav { display: none; }
+  .site-nav ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.1rem, 2vw, 2rem);
+  }
+  .site-nav__link {
+    position: relative;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    padding-block: 0.35rem;
+    transition: color 0.25s var(--ease);
+  }
+  .site-nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 0;
+    height: 1px;
+    background: var(--accent);
+    transition: width 0.3s var(--ease);
+  }
+  .site-nav__link:hover { color: var(--accent); }
+  .site-nav__link:hover::after { width: 100%; }
+
+  /* ---- Actions ---- */
+  .site-header__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: none;
+  }
+
+  /* ---- Hamburger ---- */
+  .nav-toggle {
+    inline-size: 42px;
+    block-size: 42px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--text);
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+    z-index: 101;
+  }
+  .nav-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-toggle__bars {
+    display: grid;
+    gap: 4px;
+    width: 20px;
+  }
+  .nav-toggle__bars span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.3s var(--ease), opacity 0.2s var(--ease);
+  }
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bars span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bars span:nth-child(2) { opacity: 0; }
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bars span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* ---- Right-side glass drawer ----
+     .site-menu is a transparent full-screen click-catcher; the visible panel
+     is the frosted-glass drawer that covers only the right of the page. */
+  .site-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    /* closed state */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease), visibility 0s linear 0.45s;
+  }
+  .site-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.35s var(--ease), visibility 0s;
+  }
+
+  .site-menu__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(420px, 88vw);
+    overflow-y: auto;
+    /* frosted glass — the page shows through, blurred */
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border-left: 1px solid var(--line);
+    box-shadow: -24px 0 60px rgba(20, 15, 8, 0.16);
+    transform: translateX(100%);
+    transition: transform 0.45s var(--ease);
+  }
+  .site-menu.is-open .site-menu__panel { transform: none; }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    /* No blur support → lean on a more opaque ground so text stays legible */
+    .site-menu__panel { background: color-mix(in srgb, var(--bg) 94%, transparent); }
+  }
+
+  .site-menu__nav {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.6rem, 5vh, 2.6rem);
+    padding: clamp(6rem, 12vh, 7.5rem) clamp(1.6rem, 5vw, 2.6rem) clamp(2rem, 5vh, 2.6rem);
+  }
+
+  .site-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1.6vh, 1rem);
+  }
+  .site-menu__list li {
+    /* staggered entrance */
+    opacity: 0;
+    transform: translateX(16px);
+    transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+    transition-delay: calc(var(--i) * 45ms);
+  }
+  .site-menu.is-open .site-menu__list li { opacity: 1; transform: none; }
+
+  .site-menu__link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.7rem, 5vw, 2.2rem);
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--heading);
+    width: fit-content;
+    transition: color 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .site-menu__link:hover { color: var(--accent); transform: translateX(6px); }
+  .site-menu__num {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    align-self: center;
+  }
+
+  .site-menu__foot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding-top: clamp(1.4rem, 4vh, 2rem);
+    border-top: 1px solid var(--line);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease) 0.25s;
+  }
+  .site-menu.is-open .site-menu__foot { opacity: 1; }
+  .site-menu__meta {
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .site-menu__meta a { color: var(--text); transition: color 0.25s var(--ease); }
+  .site-menu__meta a:hover { color: var(--accent); }
+
+  @media (max-width: 560px) {
+    .brand__logo { height: 44px; }
+    .site-header__actions { gap: 0.5rem; }
+  }
+
+  /* Desktop: show the inline links and drop the hamburger.
+     Placed last so it overrides the base .nav-toggle display. */
+  @media (min-width: 961px) {
+    .site-nav { display: block; }
+    .nav-toggle { display: none; }
+  }
+</style>

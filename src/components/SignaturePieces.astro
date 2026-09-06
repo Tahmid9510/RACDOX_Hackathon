@@ -1,0 +1,111 @@
+---
+/* SignaturePieces — a "pinned scroll" gallery (matching the reference's
+   "Built to your vision" section): the heading stays sticky while a column of
+   images scrolls past, each with a subtle scroll-linked parallax + reveal.
+   Parallax is driven by GSAP ScrollTrigger (already lazy-loaded); reveal is the
+   robust IntersectionObserver system. Reduced-motion → static, all visible. */
+import { Picture } from 'astro:assets';
+import chest from '../assets/images/piece-chest.jpg';
+import stool from '../assets/images/piece-stool.jpg';
+import joinery from '../assets/images/piece-joinery.jpg';
+import cane from '../assets/images/piece-cane.jpg';
+import shelf from '../assets/images/piece-shelf.jpg';
+import dining from '../assets/images/piece-dining.jpg';
+import armchair from '../assets/images/piece-armchair.jpg';
+
+const pieces = [
+  { img: chest, alt: 'A hand-carved wooden chest of drawers with brass handles' },
+  { img: cane, alt: 'The woven cane seat of a wooden chair, striped with light' },
+  { img: joinery, alt: 'A close-up of warm oak joinery on a solid-wood piece' },
+  { img: stool, alt: 'A live-edge wooden stool lit against a dark ground' },
+  { img: dining, alt: 'A solid-wood dining table and chairs in warm daylight' },
+  { img: shelf, alt: 'A ceramic vase resting on a pale wooden shelf' },
+  { img: armchair, alt: 'A solid-wood armchair with a soft cushion against a calm wall' },
+];
+---
+<section class="pieces section" aria-labelledby="pieces-title">
+  <div class="container pieces__layout">
+    <div class="pieces__aside">
+      <div class="pieces__head" data-reveal>
+        <span class="eyebrow">Signature pieces</span>
+        <h2 id="pieces-title" class="section-head__title">
+          Craft you can see <em>up close</em>.
+        </h2>
+        <p class="section-head__intro">
+          A closer look at the timber, joinery and finishes that go into every
+          Heaven piece — scroll through a few we're proud of.
+        </p>
+      </div>
+    </div>
+
+    <div class="pieces__stack">
+      {pieces.map((p) => (
+        <figure class="piece" data-reveal>
+          <div class="piece__media">
+            <Picture
+              src={p.img}
+              formats={['avif', 'webp']}
+              alt={p.alt}
+              widths={[400, 640, 820]}
+              sizes="(max-width: 820px) 92vw, 58vw"
+              loading="lazy"
+              class="piece__img"
+            />
+          </div>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pieces { background: var(--bg); transition: background-color 0.4s var(--ease); }
+
+  .pieces__layout {
+    display: grid;
+    grid-template-columns: 0.82fr 1.18fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    /* aside stretches to the image column's height so the sticky heading has
+       room to pin as the column scrolls past */
+    align-items: stretch;
+  }
+
+  /* sticky heading — stays pinned while the image column scrolls past */
+  .pieces__head {
+    position: sticky;
+    top: clamp(96px, 15vh, 160px);
+  }
+
+  .pieces__stack {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.4rem, 3vw, 2.2rem);
+  }
+
+  .piece { margin: 0; }
+  /* Each image is shown at its natural aspect ratio — full frame, no crop. */
+  .piece__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+  .piece__img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s var(--ease);
+  }
+  .piece:hover .piece__img { transform: scale(1.03); }
+
+  @media (max-width: 820px) {
+    .pieces__layout { grid-template-columns: 1fr; }
+    .pieces__head {
+      position: static;
+      text-align: center;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+  }
+</style>

@@ -1,0 +1,78 @@
+---
+/* BrandIntro (§4.4) — the positioning: a luxury studio, not a furniture shop.
+   Tight, editorial, closed with the MD's signature. */
+import { BUSINESS } from '../consts';
+---
+<section class="intro section">
+  <div class="container container--narrow intro__inner" data-reveal>
+    <p class="eyebrow">The Heaven difference</p>
+
+    <p class="intro__statement">
+      A luxury <em>studio</em>, not a furniture shop.
+    </p>
+
+    <p class="intro__body">
+      We don't stack finished pieces and wait for a buyer. We sit with you,
+      learn how you live, and design each piece to fit your space, your taste
+      and your life — then craft it by hand in our own workshop. The result is
+      furniture that feels made for you, because it is.
+    </p>
+
+    <div class="intro__sign">
+      <span class="intro__signature">{BUSINESS.founder}</span>
+      <span class="intro__role">{BUSINESS.founderRole}</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro__inner { text-align: center; }
+
+  .intro__statement {
+    margin-top: 1.2rem;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: var(--step-3);
+    line-height: 1.14;
+    letter-spacing: -0.01em;
+    color: var(--heading);
+    text-wrap: balance;
+  }
+  .intro__statement em { font-style: italic; color: var(--accent); }
+
+  .intro__body {
+    margin: 1.6rem auto 0;
+    max-width: 56ch;
+    font-size: var(--step-1);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .intro__sign {
+    margin-top: 2.4rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .intro__sign::before {
+    content: '';
+    width: 44px;
+    height: 1px;
+    background: var(--accent);
+    margin-bottom: 1.1rem;
+  }
+  .intro__signature {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--step-2);
+    color: var(--heading);
+    line-height: 1;
+  }
+  .intro__role {
+    font-size: var(--step--1);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+</style>

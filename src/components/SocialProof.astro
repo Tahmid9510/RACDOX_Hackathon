@@ -1,0 +1,254 @@
+---
+/* SocialProof (§4.8) — the MD's words, a small factual stat row (no invented
+   numbers — only what the brief states), and the milestone timeline. */
+import { Picture } from 'astro:assets';
+import { BUSINESS } from '../consts';
+import showroomImg from '../assets/images/showroom.jpg';
+
+// Only truthful, brief-sourced figures — never fabricated counts.
+const stats = [
+  { value: '2020', label: 'Founded in Chattogram' },
+  { value: '100%', label: 'Made to order' },
+  { value: 'In-house', label: 'Own workshop & artisans' },
+];
+
+const milestones = [
+  { year: '2020', text: 'Heaven Furniture Mart is founded by Abul Kalam Bhuiyan.' },
+  { year: '2021', text: 'Our showroom opens on Agrabad Access Road.' },
+  { year: '2024', text: 'We showcase our craft at a furniture fair.' },
+  { year: '2025', text: 'Recognised by the Chamber of Commerce.' },
+  { year: '2026', text: 'Honoured with BFIOA recognition.' },
+];
+---
+<section class="proof section" id="story" aria-labelledby="proof-title">
+  <div class="container">
+    <div class="proof__feature" data-reveal>
+      <Picture
+        src={showroomImg}
+        formats={['avif', 'webp']}
+        alt="A warmly lit furniture showroom vignette with a sculptural sofa"
+        widths={[600, 900, 1300]}
+        sizes="(max-width: 820px) 92vw, 1140px"
+        loading="lazy"
+        class="proof__bg"
+      />
+      <figure class="proof__quote">
+        <span class="proof__mark" aria-hidden="true">&ldquo;</span>
+        <blockquote id="proof-title">
+          {BUSINESS.mdPullQuote}
+        </blockquote>
+        <figcaption class="proof__cite">
+          <span class="proof__name">{BUSINESS.founder}</span>
+          <span class="proof__role">{BUSINESS.founderRole}</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <ul class="proof__stats" data-reveal>
+      {stats.map((s) => (
+        <li class="proof__stat">
+          <span class="proof__stat-value">{s.value}</span>
+          <span class="proof__stat-label">{s.label}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="proof__timeline-wrap">
+      <p class="eyebrow proof__timeline-title">Our story so far</p>
+      <ol class="proof__timeline">
+        {milestones.map((m, i) => (
+          <li class="proof__milestone" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <span class="proof__year">{m.year}</span>
+            <span class="proof__node" aria-hidden="true"></span>
+            <p class="proof__text">{m.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .proof { background: var(--bg); transition: background-color 0.4s var(--ease); }
+
+  /* ---- Showroom vignette + pull quote ---- */
+  .proof__feature {
+    position: relative;
+    isolation: isolate;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding: clamp(3rem, 9vw, 6.5rem) clamp(1.5rem, 6vw, 4rem);
+    display: grid;
+    place-items: center;
+    box-shadow: var(--shadow-md);
+  }
+  .proof__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* strong, warm-dark overlay so the quote is legible in both themes */
+  .proof__feature::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(16, 22, 20, 0.74), rgba(10, 15, 13, 0.84));
+  }
+
+  .proof__quote {
+    position: relative;
+    max-width: 26ch;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .proof__mark {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: clamp(4rem, 10vw, 7rem);
+    line-height: 0.7;
+    color: var(--accent-on-dark);
+    opacity: 0.75;
+    margin-bottom: 0.5rem;
+  }
+  .proof__quote blockquote {
+    font-family: var(--font-serif);
+    font-size: var(--step-3);
+    font-weight: 500;
+    line-height: 1.24;
+    color: #f6efe1;
+    text-wrap: balance;
+  }
+  .proof__cite {
+    margin-top: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .proof__name {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--step-1);
+    color: #f6efe1;
+  }
+  .proof__role {
+    font-size: var(--step--1);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(246, 239, 225, 0.72);
+  }
+
+  /* ---- Stat row ---- */
+  .proof__stats {
+    margin: clamp(3rem, 6vw, 4.5rem) auto 0;
+    max-width: 760px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .proof__stat {
+    background: var(--surface);
+    padding: clamp(1.4rem, 3vw, 2rem) 1rem;
+    text-align: center;
+  }
+  .proof__stat-value {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: var(--step-3);
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .proof__stat-label {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: var(--step--1);
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+  }
+
+  /* ---- Timeline ---- */
+  .proof__timeline-wrap { margin-top: clamp(3.5rem, 7vw, 5.5rem); }
+  .proof__timeline-title { text-align: center; display: block; margin-bottom: clamp(2rem, 4vw, 3rem); }
+
+  .proof__timeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    position: relative;
+  }
+  .proof__timeline::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 6%;
+    right: 6%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-strong) 10%, var(--line-strong) 90%, transparent);
+  }
+  .proof__milestone {
+    position: relative;
+    padding-top: 2.2rem;
+    text-align: center;
+  }
+  .proof__node {
+    position: absolute;
+    top: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+  .proof__year {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: var(--step-2);
+    color: var(--heading);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .proof__text {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 22ch;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 820px) {
+    .proof__stats { grid-template-columns: 1fr; }
+    .proof__stat + .proof__stat { border-top: 1px solid var(--line); }
+
+    /* vertical timeline */
+    .proof__timeline { grid-template-columns: 1fr; gap: 0; }
+    .proof__timeline::before {
+      top: 8px; bottom: 8px; left: 6px; right: auto;
+      width: 1px; height: auto;
+      background: linear-gradient(180deg, transparent, var(--line-strong) 8%, var(--line-strong) 92%, transparent);
+    }
+    .proof__milestone {
+      text-align: left;
+      padding-top: 0;
+      padding-left: 2.4rem;
+      padding-bottom: 1.8rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 1rem;
+      align-items: baseline;
+    }
+    .proof__milestone:last-child { padding-bottom: 0; }
+    .proof__node { top: 6px; left: 0; transform: none; }
+    .proof__year { margin-bottom: 0; }
+    .proof__text { text-align: left; margin-inline: 0; max-width: none; }
+  }
+</style>

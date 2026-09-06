@@ -1,0 +1,264 @@
+---
+/* Hero (§4.2) — the LCP zone. Headline, tagline, lead, primary WhatsApp CTA
+   + understated secondary link, and the signature sofa line-drawing.
+   Photo LCP image is added in the imagery phase; for now the hero stands on
+   typography + line art, with a warm ground so it reads luxury in both themes. */
+import { Picture } from 'astro:assets';
+import { BUSINESS } from '../consts';
+import Sofa from './Furniture/Sofa.astro';
+import heroImg from '../assets/images/hero-living-room.jpg';
+---
+<section class="hero" id="top">
+  <div class="hero__glow" aria-hidden="true"></div>
+
+  <div class="container hero__inner">
+    <div class="hero__content">
+      <p class="eyebrow hero__tagline" data-anim>{BUSINESS.taglineDots}</p>
+
+      <h1 class="hero__title" data-anim>
+        Furniture, crafted<br /><em>around you.</em>
+      </h1>
+
+      <p class="hero__lead" data-anim>
+        A bespoke luxury furniture studio in Chattogram. Every sofa, bed and
+        table is designed with you and made by hand in our own workshop —
+        never off the shelf.
+      </p>
+
+      <div class="hero__actions" data-anim>
+        <a class="btn btn--primary" href={BUSINESS.whatsapp} target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 0 0 4.73 1.2h.01c5.46 0 9.91-4.45 9.91-9.9 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.1.81.83-3.02-.2-.31a8.17 8.17 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23a8.2 8.2 0 0 1 8.22 8.24c0 4.54-3.69 8.23-8.24 8.23Zm4.52-6.16c-.25-.13-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.76-1.85-.2-.48-.4-.42-.56-.43-.14-.01-.31-.01-.47-.01-.16 0-.43.06-.65.31-.23.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.12.16 1.73 2.64 4.19 3.7.58.25 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29Z" />
+          </svg>
+          Request a quote
+        </a>
+        <a class="link-arrow" href="#collections">
+          See the collections
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </div>
+
+      <p class="hero__meta" data-anim>
+        <span>Est. 2020</span>
+        <span class="hero__dot" aria-hidden="true"></span>
+        <span>Agrabad Access Road, Chattogram</span>
+      </p>
+    </div>
+
+    <div class="hero__art">
+      <div class="hero__art-frame">
+        <Picture
+          src={heroImg}
+          formats={['avif', 'webp']}
+          alt="A calm, sunlit living room with a cream sofa, woven stool and warm wood tones"
+          widths={[280, 420, 560, 640, 880]}
+          sizes="(max-width: 480px) 230px, (max-width: 860px) 300px, 440px"
+          loading="eager"
+          fetchpriority="high"
+          class="hero__img"
+        />
+        <span class="hero__seal" aria-hidden="true">
+          <Sofa class="hero__seal-icon" />
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ---- GSAP: scroll parallax on the framed hero photo ----
+  // GSAP is dynamically imported AFTER load/idle so it never competes with the
+  // hero image download (protects LCP). The entrance is pure CSS; GSAP owns the
+  // scroll-driven motion. Skipped for reduced motion.
+  const startGsap = async () => {
+    if (!document.documentElement.classList.contains('reveal-on')) return;
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]);
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to('.hero__art-frame', {
+      yPercent: -7,
+      ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+    });
+
+    // gentle parallax on any opted-in below-fold media
+    gsap.utils.toArray('[data-parallax]').forEach((el) => {
+      gsap.fromTo(
+        el,
+        { yPercent: -6 },
+        { yPercent: 6, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } }
+      );
+    });
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(() => startGsap(), { timeout: 2000 });
+  else window.addEventListener('load', () => setTimeout(startGsap, 600), { once: true });
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: clip;
+    background:
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+    padding-block: clamp(3rem, 7vw, 6.5rem) clamp(3.5rem, 8vw, 7rem);
+  }
+
+  /* Soft warm glow behind the headline */
+  .hero__glow {
+    position: absolute;
+    inset: -20% 30% auto -10%;
+    height: 60%;
+    background: radial-gradient(
+      55% 55% at 30% 40%,
+      color-mix(in srgb, var(--wood) 28%, transparent),
+      transparent 70%
+    );
+    filter: blur(30px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* Hero entrance — pure CSS (zero JS, LCP-safe: the image is the LCP and
+     paints immediately; only the text column eases in, staggered). */
+  .hero__content [data-anim] {
+    opacity: 0;
+    animation: hero-in 0.85s var(--ease) forwards;
+  }
+  .hero__content [data-anim]:nth-child(1) { animation-delay: 0.08s; }
+  .hero__content [data-anim]:nth-child(2) { animation-delay: 0.18s; }
+  .hero__content [data-anim]:nth-child(3) { animation-delay: 0.28s; }
+  .hero__content [data-anim]:nth-child(4) { animation-delay: 0.38s; }
+  .hero__content [data-anim]:nth-child(5) { animation-delay: 0.48s; }
+  @keyframes hero-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__content [data-anim] { opacity: 1; animation: none; }
+  }
+
+  .hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+
+  .hero__tagline { margin-bottom: 1.4rem; }
+
+  .hero__title {
+    font-size: var(--step-4);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+  }
+  .hero__title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero__lead {
+    margin-top: 1.6rem;
+    max-width: 46ch;
+    font-size: var(--step-1);
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .hero__actions {
+    margin-top: 2.4rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.2rem 1.8rem;
+  }
+
+  .hero__meta {
+    margin-top: 2.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .hero__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+
+  /* ---- Framed hero photo (LCP) + brass line-drawing seal ---- */
+  .hero__art {
+    justify-self: center;
+    width: 100%;
+    max-width: 440px;
+  }
+  .hero__art-frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+  }
+  /* offset brass hairline frame behind the photo — quiet luxury detail */
+  .hero__art-frame::before {
+    content: '';
+    position: absolute;
+    inset: 16px -16px -16px 16px;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-lg);
+    z-index: 0;
+  }
+  .hero__img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+  .hero__seal {
+    position: absolute;
+    left: -20px;
+    bottom: -20px;
+    z-index: 2;
+    width: 88px;
+    height: 88px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-md);
+    color: var(--wood);
+  }
+  .hero__seal-icon { width: 60%; height: auto; }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 860px) {
+    .hero__inner {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .hero__art {
+      order: -1;
+      max-width: 300px;
+    }
+    .hero__lead { font-size: var(--step-0); }
+  }
+
+  @media (max-width: 480px) {
+    .hero__art { max-width: 230px; }
+    .hero__meta { flex-wrap: wrap; gap: 0.5rem 0.85rem; }
+  }
+</style>

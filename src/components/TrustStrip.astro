@@ -1,0 +1,96 @@
+---
+/* TrustStrip (§4.3) — a slim reassurance band under the hero.
+   Four quiet promises with fine brass line-icons. */
+const items = [
+  {
+    label: 'Free consultation',
+    // chat / advice
+    path: 'M4 5.5h16v10H10l-4 3.5v-3.5H4Z',
+  },
+  {
+    label: 'Delivery & installation',
+    // truck
+    path: 'M3 6.5h11v8H3ZM14 9h4l3 3v2.5h-7ZM7.5 17.5a1.6 1.6 0 1 0 0-.1M17.5 17.5a1.6 1.6 0 1 0 0-.1',
+  },
+  {
+    label: 'Premium materials',
+    // gem
+    path: 'M6 4.5h12l3 4-9 11-9-11ZM3 8.5h18M9 4.5l-1 4 4 11M15 4.5l1 4-4 11',
+  },
+  {
+    label: 'Easy payments',
+    // card
+    path: 'M3 6h18v12H3ZM3 10h18M6.5 14.5h4',
+  },
+];
+---
+<section class="trust" aria-label="What every client gets">
+  <ul class="container trust__list">
+    {items.map((item, i) => (
+      <li class="trust__item" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+        <svg class="trust__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d={item.path} />
+        </svg>
+        <span>{item.label}</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .trust {
+    background: var(--surface-warm);
+    border-block: 1px solid var(--line);
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+  }
+  .trust__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    padding-block: 0;
+  }
+  .trust__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding: 1.35rem 1rem;
+    text-align: center;
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    position: relative;
+  }
+  /* hairline separators between items */
+  .trust__item + .trust__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 42%;
+    width: 1px;
+    background: var(--line);
+  }
+  .trust__icon {
+    width: 22px;
+    height: 22px;
+    color: var(--accent);
+    flex: none;
+  }
+
+  @media (max-width: 760px) {
+    .trust__list { grid-template-columns: repeat(2, 1fr); }
+    .trust__item { justify-content: flex-start; padding: 1.1rem 0.5rem; }
+    /* remove the vertical rule between columns 1&2 rows; use a grid hairline */
+    .trust__item::before { display: none; }
+    .trust__item:nth-child(odd) { border-right: 1px solid var(--line); padding-left: 0.75rem; }
+    .trust__item:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+    .trust__item:nth-child(even) { padding-left: 1rem; }
+  }
+  @media (max-width: 400px) {
+    .trust__item { font-size: 0.72rem; gap: 0.5rem; }
+    .trust__icon { width: 19px; height: 19px; }
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+/* Brass line-drawing — Armchair. */
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: className, title } = Astro.props;
+const labelled = Boolean(title);
+---
+<svg
+  class={className}
+  viewBox="0 0 256 148"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={labelled ? 'img' : undefined}
+  aria-label={title}
+  aria-hidden={labelled ? undefined : 'true'}
+  focusable="false"
+>
+  <!-- backrest -->
+  <rect x="80" y="30" width="96" height="56" rx="16" />
+  <!-- arms -->
+  <rect x="58" y="60" width="26" height="50" rx="13" />
+  <rect x="172" y="60" width="26" height="50" rx="13" />
+  <!-- seat -->
+  <rect x="80" y="74" width="96" height="32" rx="10" />
+  <!-- legs -->
+  <path d="M66 110v14M190 110v14M92 106v16M164 106v16" />
+</svg>

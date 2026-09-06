@@ -1,0 +1,114 @@
+---
+/* WhyChoose (§4.5) — six trust points in a calm grid. */
+const points = [
+  {
+    title: 'Bespoke by design',
+    body: 'Every piece is made to your measurements, materials and taste — never off the shelf.',
+    path: 'M4 20l4-1 9.5-9.5-3-3L5 16l-1 4ZM14.5 6.5l3 3M13 4.2l2.4-2.4a1.6 1.6 0 0 1 2.3 0l1.9 1.9a1.6 1.6 0 0 1 0 2.3L19.8 8.5',
+  },
+  {
+    title: 'Crafted in-house',
+    body: 'Built by our own artisans in our own workshop, so we own every detail and finish.',
+    path: 'M3 21h18M6 21v-6M18 21v-6M4.5 15h15l-2-5H6.5ZM12 3v3M9 6h6',
+  },
+  {
+    title: 'Free consultation',
+    body: 'Expert guidance on layout, materials and budget before you commit a single taka.',
+    path: 'M4 5h16v10H10l-4 3.5V15H4ZM8 9h8M8 12h5',
+  },
+  {
+    title: 'Showroom in Chattogram',
+    body: 'See the wood, feel the fabric and judge the finish in person on Agrabad Access Road.',
+    path: 'M4 9l1.5-4h13L20 9M4 9h16v10H4ZM4 9c0 1.7 1.3 2.5 2.7 2.5S9.3 10.7 9.3 9M9.3 9c0 1.7 1.2 2.5 2.7 2.5S14.7 10.7 14.7 9M14.7 9c0 1.7 1.2 2.5 2.6 2.5S20 10.7 20 9M9.5 19v-5h5v5',
+  },
+  {
+    title: 'Delivery & installation',
+    body: 'We bring each piece in and set it up in your home — measured, level and ready.',
+    path: 'M3 6.5h11v8H3ZM14 9h4l3 3v2.5h-7ZM7.5 17.6a1.6 1.6 0 1 0 0-.1M17.5 17.6a1.6 1.6 0 1 0 0-.1',
+  },
+  {
+    title: 'One dedicated team',
+    body: 'The same people guide you from first sketch to final placement — one point of trust.',
+    path: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 20a5.5 5.5 0 0 1 11 0M16 11a3 3 0 0 0 0-6M18 20a5.5 5.5 0 0 0-3-5',
+  },
+];
+---
+<section class="why section" id="why" aria-labelledby="why-title">
+  <div class="container">
+    <div class="section-head section-head--center" data-reveal>
+      <span class="eyebrow">Why choose Heaven</span>
+      <h2 id="why-title" class="section-head__title">
+        Six reasons this feels <em>different</em>.
+      </h2>
+    </div>
+
+    <ul class="why__grid">
+      {points.map((p, i) => (
+        <li class="why__card" data-reveal="roll" style={`--reveal-delay:${(i % 3) * 90}ms`}>
+          <span class="why__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d={p.path} />
+            </svg>
+          </span>
+          <h3 class="why__card-title">{p.title}</h3>
+          <p class="why__card-body">{p.body}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .why { background: var(--bg-alt); transition: background-color 0.4s var(--ease); }
+
+  .why__grid {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .why__card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(1.5rem, 3vw, 2.2rem);
+    transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease),
+      border-color 0.35s var(--ease);
+  }
+  .why__card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  }
+
+  .why__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    margin-bottom: 1.3rem;
+  }
+  .why__icon svg { width: 26px; height: 26px; }
+
+  .why__card-title {
+    font-size: var(--step-2);
+    font-weight: 500;
+    color: var(--heading);
+  }
+  .why__card-body {
+    margin-top: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 860px) {
+    .why__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .why__grid { grid-template-columns: 1fr; }
+  }
+</style>
